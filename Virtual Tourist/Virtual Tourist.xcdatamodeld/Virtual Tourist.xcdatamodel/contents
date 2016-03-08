@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="15D21" minimumToolsVersion="Xcode 7.0">
+    <entity name="LocationInfo" representedClassName=".LocationInfo" syncable="YES">
+        <attribute name="addressString" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="pin" maxCount="1" deletionRule="Nullify" destinationEntity="Pin" inverseName="locationInfo" inverseEntity="Pin" syncable="YES"/>
+    </entity>
+    <entity name="MapState" representedClassName=".MapState" syncable="YES">
+        <attribute name="latitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="latitudeDelta" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="longitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="longitudeDelta" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+    </entity>
+    <entity name="Photo" representedClassName=".Photo" syncable="YES">
+        <attribute name="photoId" attributeType="String" syncable="YES"/>
+        <attribute name="photoUniqueId" attributeType="String" syncable="YES"/>
+        <attribute name="photoUrl" attributeType="String" syncable="YES"/>
+        <attribute name="savedToDisk" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <relationship name="pin" maxCount="1" deletionRule="Nullify" destinationEntity="Pin" inverseName="photos" inverseEntity="Pin" syncable="YES"/>
+    </entity>
+    <entity name="Pin" representedClassName=".Pin" syncable="YES">
+        <attribute name="downloadAndSaveStatus" attributeType="String" defaultValueString="UrlsNotLoaded" syncable="YES"/>
+        <attribute name="latitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="longitude" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="photoBatchNumber" attributeType="Integer 32" defaultValueString="1" syncable="YES"/>
+        <attribute name="uniqueId" attributeType="String" indexed="YES" syncable="YES"/>
+        <relationship name="locationInfo" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="LocationInfo" inverseName="pin" inverseEntity="LocationInfo" syncable="YES"/>
+        <relationship name="photos" toMany="YES" deletionRule="Cascade" destinationEntity="Photo" inverseName="pin" inverseEntity="Photo" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="LocationInfo" positionX="-902" positionY="-243" width="128" height="75"/>
+        <element name="MapState" positionX="-209" positionY="-261" width="128" height="105"/>
+        <element name="Photo" positionX="-414" positionY="-258" width="128" height="118"/>
+        <element name="Pin" positionX="-648" positionY="-90" width="128" height="150"/>
+    </elements>
+</model>
