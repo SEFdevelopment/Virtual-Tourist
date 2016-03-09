@@ -10,6 +10,8 @@ Tour the world without leaving the comforts of your couch! This app allows you t
 
 ## iOS frameworks and technologies used
 * UIKit
+* Auto Layout
+* Adaptive Presentation
 * Foundation
 * Core Location
 * Map Kit
