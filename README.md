@@ -27,5 +27,6 @@ Tour the world without leaving the comforts of your couch! This app allows you t
 * Lazy initialization
 * Error handling
 * Key Value Observing
+* Notifications
 * Command pattern (by using NSOperation)
 * Facade
