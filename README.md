@@ -12,7 +12,7 @@ Tour the world without leaving the comforts of your couch! This app allows you t
 * UIKit
 * Auto Layout
 * Adaptive Presentation
-* iOS UIView animations
+* UIView animations
 * Foundation
 * Core Location
 * Map Kit
