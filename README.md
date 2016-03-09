@@ -11,9 +11,11 @@ Tour the world without leaving the comforts of your couch! This app allows you t
 ## iOS frameworks and technologies used
 * UIKit
 * Foundation
+* Core Location
+* Map Kit
 * SystemConfiguration
+* Core Data & NSFetchedResultsController
 * Networking via NSURLSession
-* Core Data
 * Concurrency via NSOperationQueue, NSOperation and GCD
 
 
