@@ -62,7 +62,7 @@ class PhotoCollectionViewController: UICollectionViewController {
         
         // Target-action
         manageCollectionButton.target = self
-        manageCollectionButton.action = "manageCollectionButtonTapped"
+        manageCollectionButton.action = #selector(PhotoCollectionViewController.manageCollectionButtonTapped)
 
         // Fetched results controller
         initializeFetchedResultsController()

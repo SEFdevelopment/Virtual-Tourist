@@ -61,11 +61,11 @@ class ContainerViewController: UIViewController, UIPopoverPresentationController
         super.viewDidLoad()
         
         // Subscribe to nofitications
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "appMovingToBackgroundOrTerminate", name: UIApplicationDidEnterBackgroundNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ContainerViewController.appMovingToBackgroundOrTerminate), name: UIApplicationDidEnterBackgroundNotification, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "appMovingToBackgroundOrTerminate", name: UIApplicationWillTerminateNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ContainerViewController.appMovingToBackgroundOrTerminate), name: UIApplicationWillTerminateNotification, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "appDidEnterForeground", name: UIApplicationWillEnterForegroundNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ContainerViewController.appDidEnterForeground), name: UIApplicationWillEnterForegroundNotification, object: nil)
         
         // Fetched results controller
         initializeFetchedResultsController()

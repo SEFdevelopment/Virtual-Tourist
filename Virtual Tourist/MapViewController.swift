@@ -62,9 +62,9 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
         super.viewDidLoad()
         
         // Subscribe to nofitications
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "appMovingToBackgroundOrTerminate", name: UIApplicationDidEnterBackgroundNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MapViewController.appMovingToBackgroundOrTerminate), name: UIApplicationDidEnterBackgroundNotification, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "appMovingToBackgroundOrTerminate", name: UIApplicationWillTerminateNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MapViewController.appMovingToBackgroundOrTerminate), name: UIApplicationWillTerminateNotification, object: nil)
         
         
         // Load the map state
@@ -84,7 +84,7 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
         deleteViewConstraint.constant = 0
 
         // Gesture recognizers
-        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: "addPinToMapView:")
+        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(MapViewController.addPinToMapView(_:)))
         
         mapView.addGestureRecognizer(longPressGestureRecognizer)
         
