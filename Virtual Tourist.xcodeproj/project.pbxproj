@@ -44,7 +44,6 @@
 		E8C60C441C731E7100E84311 /* DownloadAndSavePhotoToDiskOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8C60C431C731E7100E84311 /* DownloadAndSavePhotoToDiskOperation.swift */; };
 		E8C60C461C73321100E84311 /* GlobalVariables.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8C60C451C73321000E84311 /* GlobalVariables.swift */; };
 		E8E6C1861C67BECF005CBAB4 /* PhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E6C1851C67BECF005CBAB4 /* PhotoCollectionViewCell.swift */; };
-		E8E6FCCA1C6A1B6500E53AED /* DependencyOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E6FCC91C6A1B6500E53AED /* DependencyOperator.swift */; };
 		E8E6FCCC1C6A1CA800E53AED /* ConcurrentOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E6FCCB1C6A1CA800E53AED /* ConcurrentOperation.swift */; };
 /* End PBXBuildFile section */
 
@@ -109,7 +108,6 @@
 		E8C60C431C731E7100E84311 /* DownloadAndSavePhotoToDiskOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadAndSavePhotoToDiskOperation.swift; sourceTree = "<group>"; };
 		E8C60C451C73321000E84311 /* GlobalVariables.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalVariables.swift; sourceTree = "<group>"; };
 		E8E6C1851C67BECF005CBAB4 /* PhotoCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewCell.swift; sourceTree = "<group>"; };
-		E8E6FCC91C6A1B6500E53AED /* DependencyOperator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DependencyOperator.swift; sourceTree = "<group>"; };
 		E8E6FCCB1C6A1CA800E53AED /* ConcurrentOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConcurrentOperation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -296,7 +294,6 @@
 		E8C60C3E1C731BC900E84311 /* Abstract */ = {
 			isa = PBXGroup;
 			children = (
-				E8E6FCC91C6A1B6500E53AED /* DependencyOperator.swift */,
 				E8E6FCCB1C6A1CA800E53AED /* ConcurrentOperation.swift */,
 			);
 			name = Abstract;
@@ -476,7 +473,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8362E3F1C7B424C00453300 /* AlertControllers.swift in Sources */,
-				E8E6FCCA1C6A1B6500E53AED /* DependencyOperator.swift in Sources */,
 				E88D156E1C71B4D200D2DA66 /* PhotoUrlInfo.swift in Sources */,
 				E83C549E1C84237300DE01D9 /* DownloadAndSaveStatusTracker.swift in Sources */,
 				4EBA5DA21C7094840080012C /* Photo.swift in Sources */,

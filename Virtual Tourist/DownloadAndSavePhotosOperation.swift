@@ -81,7 +81,9 @@ class DownloadAndSavePhotosOperation: ConcurrentOperation {
             
             
             // Set dependencies among operations and add them to the queue
-            downloadPhotoUrlsOperation |> insertPhotosForUrlsListOperation |> downloadAndSavePhotoBatchOperation
+            insertPhotosForUrlsListOperation.addDependency(downloadPhotoUrlsOperation)
+            downloadAndSavePhotoBatchOperation.addDependency(insertPhotosForUrlsListOperation)
+            
             
             downloadAndSaveQueue.addOperations([downloadPhotoUrlsOperation, insertPhotosForUrlsListOperation, downloadAndSavePhotoBatchOperation], waitUntilFinished: false)
             
