@@ -15,8 +15,8 @@ class MapState: NSManagedObject {
 
     var center: CLLocationCoordinate2D {
         
-        let clLatitude = latitude as CLLocationDegrees
-        let clLongitude = longitude as CLLocationDegrees
+        let clLatitude = latitude.doubleValue as CLLocationDegrees
+        let clLongitude = longitude.doubleValue as CLLocationDegrees
         
         return CLLocationCoordinate2D(latitude: clLatitude, longitude: clLongitude)
         
@@ -24,8 +24,8 @@ class MapState: NSManagedObject {
     
     var span: MKCoordinateSpan {
         
-        let clLatitudeDelta = latitudeDelta as CLLocationDegrees
-        let clLongitudeDelta = longitudeDelta as CLLocationDegrees
+        let clLatitudeDelta = latitudeDelta.doubleValue as CLLocationDegrees
+        let clLongitudeDelta = longitudeDelta.doubleValue as CLLocationDegrees
         
         return MKCoordinateSpan(latitudeDelta: clLatitudeDelta, longitudeDelta: clLongitudeDelta)
         
