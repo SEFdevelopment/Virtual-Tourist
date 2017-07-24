@@ -123,7 +123,7 @@ class DownloadAndSavePhotosOperation: ConcurrentOperation {
                         
                         var allPhotosDownloadedAndSaved = false
                         
-                        DispatchQueue.main.sync { [allPhotosDownloadedAndSaved]
+                        DispatchQueue.main.sync {
                             
                             allPhotosDownloadedAndSaved = self.coreDataManager.allPhotosForPinWereDownloadedAndSaved(self.uniqueId)
                             
