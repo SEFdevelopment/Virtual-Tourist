@@ -76,10 +76,10 @@ extension CoreDataManager {
         
         let mapState = MapState(entity: mapStateEntity, insertInto: managedObjectContext)
         
-        mapState.latitude = NSNumber(latitude)
-        mapState.longitude = NSNumber(longitude)
-        mapState.latitudeDelta = NSNumber(latitudeDelta)
-        mapState.longitudeDelta = NSNumber(longitudeDelta)
+        mapState.latitude = NSNumber(value: latitude)
+        mapState.longitude = NSNumber(value: longitude)
+        mapState.latitudeDelta = NSNumber(value: latitudeDelta)
+        mapState.longitudeDelta = NSNumber(value: longitudeDelta)
         
         
     }
@@ -92,10 +92,10 @@ extension CoreDataManager {
         let latitudeDelta = region.span.latitudeDelta as Double
         let longitudeDelta = region.span.longitudeDelta as Double
         
-        mapState.latitude = NSNumber(latitude)
-        mapState.longitude = NSNumber(longitude)
-        mapState.latitudeDelta = NSNumber(latitudeDelta)
-        mapState.longitudeDelta = NSNumber(longitudeDelta)
+        mapState.latitude = NSNumber(value: latitude)
+        mapState.longitude = NSNumber(value: longitude)
+        mapState.latitudeDelta = NSNumber(value: latitudeDelta)
+        mapState.longitudeDelta = NSNumber(value: longitudeDelta)
         
     }
     
@@ -190,8 +190,8 @@ extension CoreDataManager {
         let pinEntity = NSEntityDescription.entity(forEntityName: pinEntityName, in: managedObjectContext)!
         
         let pin = Pin(entity: pinEntity, insertInto: managedObjectContext)
-        pin.latitude = NSNumber(latitude)
-        pin.longitude = NSNumber(longitude)
+        pin.latitude = NSNumber(value: latitude)
+        pin.longitude = NSNumber(value: longitude)
         pin.uniqueId = uniqueId!
         
         saveContext()
