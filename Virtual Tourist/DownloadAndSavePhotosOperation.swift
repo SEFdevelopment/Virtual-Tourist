@@ -31,7 +31,7 @@ class DownloadAndSavePhotosOperation: ConcurrentOperation {
     
     
     // MARK: - Internal queue
-    dynamic let downloadAndSaveQueue = NSOperationQueue()
+    dynamic let downloadAndSaveQueue = OperationQueue()
     
     
     // MARK: - Download and save status
@@ -55,7 +55,7 @@ class DownloadAndSavePhotosOperation: ConcurrentOperation {
         
         super.init()
         
-        downloadAndSaveQueue.addObserver(self, forKeyPath: "operationCount", options: .New, context: &downloadAndSavePhotosContext)
+        downloadAndSaveQueue.addObserver(self, forKeyPath: "operationCount", options: .new, context: &downloadAndSavePhotosContext)
         
     }
     
@@ -65,7 +65,7 @@ class DownloadAndSavePhotosOperation: ConcurrentOperation {
     // main() override
     override func main() {
         
-        if cancelled { cancelOperation(); return }
+        if isCancelled { cancelOperation(); return }
         
         
         // Initialize the operations
@@ -107,11 +107,11 @@ class DownloadAndSavePhotosOperation: ConcurrentOperation {
     // MARK: - Key value observing
     
     // We mark the DownloadAndSavePhotos operation as finished when the operationsCount property of the privateQueue becomes equal to 0.
-    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         
         if context == &downloadAndSavePhotosContext {
             
-            if let newOperationCountValue = change?[NSKeyValueChangeNewKey] as? Int {
+            if let newOperationCountValue = change?[NSKeyValueChangeKey.newKey] as? Int {
                 
                 if newOperationCountValue == 0 {
                     
@@ -121,7 +121,7 @@ class DownloadAndSavePhotosOperation: ConcurrentOperation {
                         
                         var allPhotosDownloadedAndSaved = false
                         
-                        dispatch_sync(dispatch_get_main_queue()) { [allPhotosDownloadedAndSaved]
+                        DispatchQueue.main.sync { [allPhotosDownloadedAndSaved]
                             
                             allPhotosDownloadedAndSaved = self.coreDataManager.allPhotosForPinWereDownloadedAndSaved(self.uniqueId)
                             
@@ -147,7 +147,7 @@ class DownloadAndSavePhotosOperation: ConcurrentOperation {
             
         } else {
             
-            super.observeValueForKeyPath(keyPath, ofObject: object, change: change, context: context)
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
             
         }
     }
@@ -174,7 +174,7 @@ class DownloadAndSavePhotosOperation: ConcurrentOperation {
     // MARK: - Update pin status
     func updatePinStatus() {
         
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             
             self.coreDataManager.updateDownloadAndSaveStatusForPin(self.uniqueId, downloadAndSaveStatus: self.downloadAndSaveStatus.status.rawValue)
         }

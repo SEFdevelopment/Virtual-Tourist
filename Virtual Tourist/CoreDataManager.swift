@@ -65,37 +65,37 @@ class CoreDataManager: NSObject {
 extension CoreDataManager {
     
     // Managing map's state between application launches
-    func insertMapState(region: MKCoordinateRegion) {
+    func insertMapState(_ region: MKCoordinateRegion) {
         
         let latitude = region.center.latitude as Double
         let longitude = region.center.longitude as Double
         let latitudeDelta = region.span.latitudeDelta as Double
         let longitudeDelta = region.span.longitudeDelta as Double
         
-        let mapStateEntity = NSEntityDescription.entityForName(mapStateEntityName, inManagedObjectContext: managedObjectContext)!
+        let mapStateEntity = NSEntityDescription.entity(forEntityName: mapStateEntityName, in: managedObjectContext)!
         
-        let mapState = MapState(entity: mapStateEntity, insertIntoManagedObjectContext: managedObjectContext)
+        let mapState = MapState(entity: mapStateEntity, insertInto: managedObjectContext)
         
-        mapState.latitude = latitude
-        mapState.longitude = longitude
-        mapState.latitudeDelta = latitudeDelta
-        mapState.longitudeDelta = longitudeDelta
+        mapState.latitude = NSNumber(latitude)
+        mapState.longitude = NSNumber(longitude)
+        mapState.latitudeDelta = NSNumber(latitudeDelta)
+        mapState.longitudeDelta = NSNumber(longitudeDelta)
         
         
     }
     
     
-    func updateMapState(mapState: MapState, region: MKCoordinateRegion) {
+    func updateMapState(_ mapState: MapState, region: MKCoordinateRegion) {
         
         let latitude = region.center.latitude as Double
         let longitude = region.center.longitude as Double
         let latitudeDelta = region.span.latitudeDelta as Double
         let longitudeDelta = region.span.longitudeDelta as Double
         
-        mapState.latitude = latitude
-        mapState.longitude = longitude
-        mapState.latitudeDelta = latitudeDelta
-        mapState.longitudeDelta = longitudeDelta
+        mapState.latitude = NSNumber(latitude)
+        mapState.longitude = NSNumber(longitude)
+        mapState.latitudeDelta = NSNumber(latitudeDelta)
+        mapState.longitudeDelta = NSNumber(longitudeDelta)
         
     }
     
@@ -104,11 +104,11 @@ extension CoreDataManager {
         
         var results = [MapState]()
         
-        let mapStateFetchRequest = NSFetchRequest(entityName: mapStateEntityName)
+        let mapStateFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: mapStateEntityName)
         
         do {
             
-            results = try managedObjectContext.executeFetchRequest(mapStateFetchRequest) as! [MapState]
+            results = try managedObjectContext.fetch(mapStateFetchRequest) as! [MapState]
             
             if results.isEmpty {
                 
@@ -134,14 +134,14 @@ extension CoreDataManager {
 // MARK: - LOCATION INFO
 extension CoreDataManager {
     
-    func insertLocationInfoToMangedContext(uniqueId: String, addressString: String) {
+    func insertLocationInfoToMangedContext(_ uniqueId: String, addressString: String) {
         
         if let pin = fetchPinForId(uniqueId) {
             
             // Create an infoLocation object and associate it with pin
-            let locationInfoEntity = NSEntityDescription.entityForName(locationInfoEntityName, inManagedObjectContext: managedObjectContext)!
+            let locationInfoEntity = NSEntityDescription.entity(forEntityName: locationInfoEntityName, in: managedObjectContext)!
             
-            let locationInfo = LocationInfo(entity: locationInfoEntity, insertIntoManagedObjectContext: managedObjectContext)
+            let locationInfo = LocationInfo(entity: locationInfoEntity, insertInto: managedObjectContext)
             
             locationInfo.addressString = addressString
             
@@ -152,7 +152,7 @@ extension CoreDataManager {
     }
     
     
-    func updateLocationInfo(uniqueId: String, addressString: String) {
+    func updateLocationInfo(_ uniqueId: String, addressString: String) {
         
         if let pin = fetchPinForId(uniqueId) {
             
@@ -187,12 +187,12 @@ extension CoreDataManager {
         let longitude = coordinate.longitude as Double
         let uniqueId = annotation.uniqueId
         
-        let pinEntity = NSEntityDescription.entityForName(pinEntityName, inManagedObjectContext: managedObjectContext)!
+        let pinEntity = NSEntityDescription.entity(forEntityName: pinEntityName, in: managedObjectContext)!
         
-        let pin = Pin(entity: pinEntity, insertIntoManagedObjectContext: managedObjectContext)
-        pin.latitude = latitude
-        pin.longitude = longitude
-        pin.uniqueId = uniqueId
+        let pin = Pin(entity: pinEntity, insertInto: managedObjectContext)
+        pin.latitude = NSNumber(latitude)
+        pin.longitude = NSNumber(longitude)
+        pin.uniqueId = uniqueId!
         
         saveContext()
         
@@ -206,7 +206,7 @@ extension CoreDataManager {
         
         let uniqueId = annotation.uniqueId
         
-        deletePinFromManagedContext(forUniqueId: uniqueId)
+        deletePinFromManagedContext(forUniqueId: uniqueId!)
         
         
     }
@@ -214,17 +214,17 @@ extension CoreDataManager {
     
     func deletePinFromManagedContext(forUniqueId uniqueId: String) {
         
-        let deletePinFetchRequest = NSFetchRequest(entityName: pinEntityName)
+        let deletePinFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: pinEntityName)
         
         deletePinFetchRequest.predicate = NSPredicate(format: "uniqueId == %@", uniqueId)
         
         do {
             
-            let pinsToBeDeleted = try managedObjectContext.executeFetchRequest(deletePinFetchRequest) as! [Pin]
+            let pinsToBeDeleted = try managedObjectContext.fetch(deletePinFetchRequest) as! [Pin]
             
             for pin in pinsToBeDeleted {
                 
-                managedObjectContext.deleteObject(pin)
+                managedObjectContext.delete(pin)
                 
                 saveContext()
                 
@@ -243,17 +243,17 @@ extension CoreDataManager {
     
     
     // MARK: - Fetching pins
-    func fetchPinForId(uniqueId: String) -> Pin? {
+    func fetchPinForId(_ uniqueId: String) -> Pin? {
         
         var pin: Pin?
         
-        let pinForIdFetchRequest = NSFetchRequest(entityName: pinEntityName)
+        let pinForIdFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: pinEntityName)
         
         pinForIdFetchRequest.predicate = NSPredicate(format: "uniqueId == %@", uniqueId)
         
         do {
             
-            let pins = try managedObjectContext.executeFetchRequest(pinForIdFetchRequest) as! [Pin]
+            let pins = try managedObjectContext.fetch(pinForIdFetchRequest) as! [Pin]
             
             guard pins.count > 0 else { return nil }
             
@@ -272,11 +272,11 @@ extension CoreDataManager {
     }
     
     
-    func fetchPinForAnnotation(annotation: MKPointAnnotationWithUniqueId) -> Pin? {
+    func fetchPinForAnnotation(_ annotation: MKPointAnnotationWithUniqueId) -> Pin? {
         
         let uniqueId = annotation.uniqueId
         
-        let pin = fetchPinForId(uniqueId)
+        let pin = fetchPinForId(uniqueId!)
         
         return pin
         
@@ -287,11 +287,11 @@ extension CoreDataManager {
         
         var results = [Pin]()
         
-        let allPinsFetchRequest = NSFetchRequest(entityName: pinEntityName)
+        let allPinsFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: pinEntityName)
         
         do {
             
-            results = try managedObjectContext.executeFetchRequest(allPinsFetchRequest) as! [Pin]
+            results = try managedObjectContext.fetch(allPinsFetchRequest) as! [Pin]
             
         } catch {
             
@@ -307,19 +307,19 @@ extension CoreDataManager {
     
     func fetchNumberOfPins() -> Int? {
         
-        let allPinsCountFetchRequest = NSFetchRequest(entityName: pinEntityName)
+        let allPinsCountFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: pinEntityName)
         
-        allPinsCountFetchRequest.resultType = .CountResultType
+        allPinsCountFetchRequest.resultType = .countResultType
         
         var result: Int?
         
         do {
             
-            let results = try managedObjectContext.executeFetchRequest(allPinsCountFetchRequest) as? [NSNumber]
+            let results = try managedObjectContext.fetch(allPinsCountFetchRequest) as? [NSNumber]
             
             if let results = results {
                 
-                result = results[0].integerValue
+                result = results[0].intValue
                 
             }
             
@@ -337,7 +337,7 @@ extension CoreDataManager {
     
     
     // MARK: - Update pin status
-    func updateDownloadAndSaveStatusForPin(uniqueId: String, downloadAndSaveStatus: String) {
+    func updateDownloadAndSaveStatusForPin(_ uniqueId: String, downloadAndSaveStatus: String) {
         
         guard let pin = fetchPinForId(uniqueId) else { return }
         
@@ -359,16 +359,16 @@ extension CoreDataManager {
 extension CoreDataManager {
     
     // MARK: - Save and update photos
-    func insertPhotosForUrlsList(uniqueId: String, photoUrlList: [PhotoUrlInfo]) {
+    func insertPhotosForUrlsList(_ uniqueId: String, photoUrlList: [PhotoUrlInfo]) {
         
         if let pin = fetchPinForId(uniqueId) {
             
             // Create a Photo object and associate it with pin
-            let photoEntity = NSEntityDescription.entityForName(photoEntityName, inManagedObjectContext: managedObjectContext)!
+            let photoEntity = NSEntityDescription.entity(forEntityName: photoEntityName, in: managedObjectContext)!
             
             for photoUrlInfo in photoUrlList {
                 
-                let photo = Photo(entity: photoEntity, insertIntoManagedObjectContext: managedObjectContext)
+                let photo = Photo(entity: photoEntity, insertInto: managedObjectContext)
                 
                 photo.photoId = photoUrlInfo.photoId
                 photo.photoUrl = photoUrlInfo.photoUrl
@@ -379,7 +379,7 @@ extension CoreDataManager {
             }
             
             // Increase the photo batch number
-            pin.photoBatchNumber = NSNumber(integer: (pin.photoBatchNumber.integerValue + 1))
+            pin.photoBatchNumber = NSNumber(value: (pin.photoBatchNumber.intValue + 1) as Int)
             
             // Save context
             saveContext()
@@ -388,7 +388,7 @@ extension CoreDataManager {
         
     }
     
-    func updateLocalPhotoUrl(uniquePhotoId: String, localPhotoUrl: String) {
+    func updateLocalPhotoUrl(_ uniquePhotoId: String, localPhotoUrl: String) {
         
         if let photo = fetchPhotoForId(uniquePhotoId) {
             
@@ -402,17 +402,17 @@ extension CoreDataManager {
     
     
     // MARK: - Fetch photos
-    func fetchPhotoForId(uniquePhotoId: String) -> Photo? {
+    func fetchPhotoForId(_ uniquePhotoId: String) -> Photo? {
         
         var photo: Photo?
         
-        let photoForIdFetchRequest = NSFetchRequest(entityName: photoEntityName)
+        let photoForIdFetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: photoEntityName)
         
         photoForIdFetchRequest.predicate = NSPredicate(format: "photoUniqueId == %@", uniquePhotoId)
         
         do {
             
-            let photos = try managedObjectContext.executeFetchRequest(photoForIdFetchRequest) as! [Photo]
+            let photos = try managedObjectContext.fetch(photoForIdFetchRequest) as! [Photo]
             
             guard photos.count > 0 else { return nil }
             
@@ -430,7 +430,7 @@ extension CoreDataManager {
         
     }
     
-    func allPhotosForPinWereDownloadedAndSaved(uniqueId: String) -> Bool {
+    func allPhotosForPinWereDownloadedAndSaved(_ uniqueId: String) -> Bool {
         
         guard let pin = fetchPinForId(uniqueId) else { return false }
         
@@ -438,7 +438,7 @@ extension CoreDataManager {
         
         for photo in pin.photos {
             
-            if photo.savedToDisk == false {
+            if (photo as AnyObject).savedToDisk == false {
                 
                 return false
                 
@@ -453,9 +453,9 @@ extension CoreDataManager {
     
     
     // MARK: - Delete photos
-    func deletePhotoFromManagedContext(photo: Photo) {
+    func deletePhotoFromManagedContext(_ photo: Photo) {
         
-        managedObjectContext.deleteObject(photo)
+        managedObjectContext.delete(photo)
         
         saveContext()
         
@@ -463,7 +463,7 @@ extension CoreDataManager {
     }
     
     
-    func deletePhotoFromManagedContextForUniqueId(uniqueId: String, photoUrlInfo: PhotoUrlInfo) {
+    func deletePhotoFromManagedContextForUniqueId(_ uniqueId: String, photoUrlInfo: PhotoUrlInfo) {
         
         let photoId = photoUrlInfo.photoId
         
@@ -471,7 +471,7 @@ extension CoreDataManager {
         
         if let photoToDelete = fetchPhotoForId(uniquePhotoId) {
             
-            managedObjectContext.deleteObject(photoToDelete)
+            managedObjectContext.delete(photoToDelete)
             
         }
         
@@ -479,7 +479,7 @@ extension CoreDataManager {
         
     }
     
-    func deleteAllPhotosForPinFromCoreData(uniqueId: String) {
+    func deleteAllPhotosForPinFromCoreData(_ uniqueId: String) {
         
         guard let pin = fetchPinForId(uniqueId) else { return }
         

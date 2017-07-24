@@ -40,7 +40,7 @@ class InsertPhotosForUrlsListOperation: ConcurrentOperation {
     // main() override
     override func main() {
         
-        if cancelled { cancelOperation(); return }
+        if isCancelled { cancelOperation(); return }
         
         if let downloadPhotoUrlsOperation = dependencies.last as? DownloadPhotoUrlsOperation {
             
@@ -82,7 +82,7 @@ class InsertPhotosForUrlsListOperation: ConcurrentOperation {
         
         downloadAndSaveStatus.status = .InsertedPhotosForUrlsList
         
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             
             self.coreDataManager.insertPhotosForUrlsList(self.uniqueId, photoUrlList: self.photoUrlsList!)
             self.coreDataManager.updateDownloadAndSaveStatusForPin(self.uniqueId, downloadAndSaveStatus: self.downloadAndSaveStatus.status.rawValue)
@@ -95,7 +95,7 @@ class InsertPhotosForUrlsListOperation: ConcurrentOperation {
     
     func deleteAllPhotosForPinFromCoreData() {
         
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             
             self.coreDataManager.deleteAllPhotosForPinFromCoreData(self.uniqueId)
             

@@ -23,7 +23,7 @@ class SmallMapViewController: UIViewController {
     // MARK: - METHODS
     
     // MARK: - View controller life cycle    
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         let region = MKCoordinateRegionMakeWithDistance(selectedAnnotation.coordinate, 300000, 300000) //If putting smaller values, the map may not render in some areas of the globe

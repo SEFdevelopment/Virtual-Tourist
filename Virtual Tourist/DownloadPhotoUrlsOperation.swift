@@ -26,7 +26,7 @@ class DownloadPhotoUrlsOperation: ConcurrentOperation {
     
     
     // MARK: - Network
-    lazy var session = NSURLSession.sharedSession()
+    lazy var session = URLSession.shared
     
     
     
@@ -40,7 +40,7 @@ class DownloadPhotoUrlsOperation: ConcurrentOperation {
         
         super.init()
         
-        qualityOfService = NSQualityOfService.UserInteractive
+        qualityOfService = QualityOfService.userInteractive
         
     }
     
@@ -50,15 +50,15 @@ class DownloadPhotoUrlsOperation: ConcurrentOperation {
     // main() override
     override func main() {
         
-        if cancelled { cancelOperation(); return }
+        if isCancelled { cancelOperation(); return }
         
         var photoBatchNumber: Int = 1
         
-        dispatch_sync(dispatch_get_main_queue()) {
+        DispatchQueue.main.sync {
             
             if let pin = self.coreDataManager.fetchPinForId(self.uniqueId) {
                 
-                photoBatchNumber = pin.photoBatchNumber.integerValue
+                photoBatchNumber = pin.photoBatchNumber.intValue
                 
             }
             
@@ -70,7 +70,7 @@ class DownloadPhotoUrlsOperation: ConcurrentOperation {
     
     
     // MARK: - URL request
-    func getPhotoUrlsListRequest(coordinate: CLLocationCoordinate2D, photoBatchNumber: Int) -> NSMutableURLRequest {
+    func getPhotoUrlsListRequest(_ coordinate: CLLocationCoordinate2D, photoBatchNumber: Int) -> NSMutableURLRequest {
         
         // Flickr constants
         let baseUrl = "https://api.flickr.com/services/rest/"
@@ -90,24 +90,24 @@ class DownloadPhotoUrlsOperation: ConcurrentOperation {
         let page = String(photoBatchNumber)
         
         // Request
-        let requestURLComponents = NSURLComponents(string: baseUrl)!
+        var requestURLComponents = URLComponents(string: baseUrl)!
         
-        let methodItem = NSURLQueryItem(name: "method", value: method)
-        let api_keyItem = NSURLQueryItem(name: "api_key", value: api_key)
-        let min_upload_dateItem = NSURLQueryItem(name: "min_upload_date", value: min_upload_date)
-        let latItem = NSURLQueryItem(name: "lat", value: lat)
-        let lonItem = NSURLQueryItem(name: "lon", value: lon)
-        let radiusItem = NSURLQueryItem(name: "radius", value: radius)
-        let per_pageItem = NSURLQueryItem(name: "per_page", value: per_page)
-        let pageItem = NSURLQueryItem(name: "page", value: page)
-        let formatItem = NSURLQueryItem(name: "format", value: format)
-        let nojsoncallbackItem = NSURLQueryItem(name: "nojsoncallback", value: nojsoncallback)
+        let methodItem = URLQueryItem(name: "method", value: method)
+        let api_keyItem = URLQueryItem(name: "api_key", value: api_key)
+        let min_upload_dateItem = URLQueryItem(name: "min_upload_date", value: min_upload_date)
+        let latItem = URLQueryItem(name: "lat", value: lat)
+        let lonItem = URLQueryItem(name: "lon", value: lon)
+        let radiusItem = URLQueryItem(name: "radius", value: radius)
+        let per_pageItem = URLQueryItem(name: "per_page", value: per_page)
+        let pageItem = URLQueryItem(name: "page", value: page)
+        let formatItem = URLQueryItem(name: "format", value: format)
+        let nojsoncallbackItem = URLQueryItem(name: "nojsoncallback", value: nojsoncallback)
         
         requestURLComponents.queryItems = [methodItem, api_keyItem, min_upload_dateItem, latItem, lonItem, radiusItem, per_pageItem, pageItem, formatItem, nojsoncallbackItem]
         
-        let requestURL = requestURLComponents.URL!
+        let requestURL = requestURLComponents.url!
         
-        let request = NSMutableURLRequest(URL: requestURL)
+        let request = NSMutableURLRequest(url: requestURL)
         
         return request
         
@@ -115,26 +115,26 @@ class DownloadPhotoUrlsOperation: ConcurrentOperation {
     
     
     // MARK: - Get image list from Flickr
-    func downloadPhotoUrlsList(photoBatchNumber photoBatchNumber: Int) {
+    func downloadPhotoUrlsList(photoBatchNumber: Int) {
         
-        if cancelled { cancelOperation(); return }
+        if isCancelled { cancelOperation(); return }
         
         
         let request = getPhotoUrlsListRequest(coordinate, photoBatchNumber: photoBatchNumber)
         
-        if cancelled { cancelOperation(); return }
+        if isCancelled { cancelOperation(); return }
         
-        let task = session.dataTaskWithRequest(request) { data, response, error in
+        let task = session.dataTask(with: request, completionHandler: { data, response, error in
                         
             
-            if self.cancelled { self.cancelOperation(); return }
+            if self.isCancelled { self.cancelOperation(); return }
             
             
             // Check for errors
             guard error == nil else { self.couldNotGetPhotoUrls(); return }
             
             // Check for status code of the response
-            guard let httpResponse = response as? NSHTTPURLResponse  else { self.couldNotGetPhotoUrls(); return }
+            guard let httpResponse = response as? HTTPURLResponse  else { self.couldNotGetPhotoUrls(); return }
             let statusCode = httpResponse.statusCode
             guard (statusCode >= 200) && (statusCode <= 299)  else { self.couldNotGetPhotoUrls(); return }
             
@@ -142,23 +142,23 @@ class DownloadPhotoUrlsOperation: ConcurrentOperation {
             guard let data = data else { self.couldNotGetPhotoUrls(); return }
             
             // Parse data
-            if self.cancelled { self.cancelOperation(); return }
+            if self.isCancelled { self.cancelOperation(); return }
             
             do {
                 
-                let parsedJSON = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.AllowFragments)
+                let parsedJSON = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments)
                 
                 guard let photosDictionary = parsedJSON["photos"] as? [String: AnyObject] else { self.couldNotGetPhotoUrls(); return }
                 
                 guard let photoArray = photosDictionary["photo"] as? [NSDictionary] else { self.couldNotGetPhotoUrls(); return }
                 
-                if self.cancelled { self.cancelOperation(); return }
+                if self.isCancelled { self.cancelOperation(); return }
                 
                 self.photoUrlsList = [PhotoUrlInfo]()
                 
                 for photo in photoArray {
                     
-                    if self.cancelled { self.cancelOperation(); return }
+                    if self.isCancelled { self.cancelOperation(); return }
                     
                     guard let photoId = photo["id"] as? String else { continue }
                     guard let serverId = photo["server"] as? String else { continue }
@@ -201,7 +201,7 @@ class DownloadPhotoUrlsOperation: ConcurrentOperation {
             
             
             
-        }
+        }) 
         
         task.resume()
         
@@ -227,7 +227,7 @@ class DownloadPhotoUrlsOperation: ConcurrentOperation {
     // MARK: - Update pin status
     func updatePinStatus() {
         
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             
             self.coreDataManager.updateDownloadAndSaveStatusForPin(self.uniqueId, downloadAndSaveStatus: self.downloadAndSaveStatus.status.rawValue)
         }

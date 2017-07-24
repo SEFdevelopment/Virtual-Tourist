@@ -27,7 +27,7 @@ class DownloadAndSavePhotoToDiskOperation: ConcurrentOperation {
     var coreDataManager: CoreDataManager
     
     // MARK: - Network
-    lazy var session = NSURLSession.sharedSession()
+    lazy var session = URLSession.shared
     
     
     // MARK: - INITIALIZERS
@@ -47,7 +47,7 @@ class DownloadAndSavePhotoToDiskOperation: ConcurrentOperation {
     // main() override
     override func main() {
         
-        if cancelled { cancelOperation(); return }
+        if isCancelled { cancelOperation(); return }
         
         downloadAndSavePhotoToDisk()
         
@@ -56,44 +56,44 @@ class DownloadAndSavePhotoToDiskOperation: ConcurrentOperation {
     
     func downloadAndSavePhotoToDisk() {
         
-        if cancelled { cancelOperation(); return }
+        if isCancelled { cancelOperation(); return }
     
         
-        let request = NSURLRequest(URL: NSURL(string: photoUrlInfo.photoUrl)!)
+        let request = URLRequest(url: URL(string: photoUrlInfo.photoUrl)!)
         
-        let task = session.dataTaskWithRequest(request) { data, response, error in
+        let task = session.dataTask(with: request, completionHandler: { data, response, error in
                         
             
-            if self.cancelled { self.cancelOperation(); return }
+            if self.isCancelled { self.cancelOperation(); return }
             
             
             // Check for errors
             guard error == nil else { self.couldNotSavePhoto(); return }
             
             // Check for status code of the response
-            guard let httpResponse = response as? NSHTTPURLResponse  else { self.couldNotSavePhoto(); return }
+            guard let httpResponse = response as? HTTPURLResponse  else { self.couldNotSavePhoto(); return }
             let statusCode = httpResponse.statusCode
             guard (statusCode >= 200) && (statusCode <= 299)  else { self.couldNotSavePhoto(); return }
             
             // Check that data is not nil
             guard let data = data else { self.couldNotSavePhoto(); return }
             
-            if self.cancelled { self.cancelOperation(); return }
+            if self.isCancelled { self.cancelOperation(); return }
 
             // Resize the image to 350 pixels for performance reasons (it comes 500 pixels from Flickr). Source: http://nshipster.com/image-resizing/
-            guard let imageSource = CGImageSourceCreateWithData(data, nil) else { self.couldNotSavePhoto(); return }
+            guard let imageSource = CGImageSourceCreateWithData(data as CFData, nil) else { self.couldNotSavePhoto(); return }
             
             let options: [NSString: NSObject] = [
-                kCGImageSourceThumbnailMaxPixelSize: 350,
-                kCGImageSourceCreateThumbnailFromImageAlways: true
+                kCGImageSourceThumbnailMaxPixelSize: 350 as NSObject,
+                kCGImageSourceCreateThumbnailFromImageAlways: true as NSObject
             ]
             
-            guard let resizedCGImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options) else { self.couldNotSavePhoto(); return  }
+            guard let resizedCGImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options as CFDictionary) else { self.couldNotSavePhoto(); return  }
             
-            let downloadedPhoto = UIImage(CGImage: resizedCGImage)
+            let downloadedPhoto = UIImage(cgImage: resizedCGImage)
             
             
-            if self.cancelled { self.cancelOperation(); return }
+            if self.isCancelled { self.cancelOperation(); return }
             
             
             // Save image to disk
@@ -103,16 +103,16 @@ class DownloadAndSavePhotoToDiskOperation: ConcurrentOperation {
             
             let photoUrlComponent = photoUniqueId + ".jpg"
             
-            let photoSaveUrl = virtualTouristPhotosDirectoryUrl.URLByAppendingPathComponent(photoUrlComponent)
+            let photoSaveUrl = virtualTouristPhotosDirectoryUrl.appendingPathComponent(photoUrlComponent)
             
             guard let photoSaveUrlPath = photoSaveUrl.path else { self.couldNotSavePhoto(); return }
             
             
-            if self.cancelled { self.cancelOperation(); return }
+            if self.isCancelled { self.cancelOperation(); return }
             
-            if jpegRepresentation.writeToURL(photoSaveUrl, atomically: true) {
+            if (try? jpegRepresentation.write(to: photoSaveUrl, options: [.atomic])) != nil {
                 
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     
                     self.coreDataManager.updateLocalPhotoUrl(photoUniqueId, localPhotoUrl: photoSaveUrlPath)
                     
@@ -128,7 +128,7 @@ class DownloadAndSavePhotoToDiskOperation: ConcurrentOperation {
             
             self.state = .Finished
             
-        }
+        }) 
         
         task.resume()
         
@@ -138,7 +138,7 @@ class DownloadAndSavePhotoToDiskOperation: ConcurrentOperation {
     func couldNotSavePhoto() {
         
         
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             
             self.coreDataManager.deletePhotoFromManagedContextForUniqueId(self.uniqueId, photoUrlInfo: self.photoUrlInfo)
             

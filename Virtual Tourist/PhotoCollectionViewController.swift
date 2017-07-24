@@ -26,16 +26,16 @@ class PhotoCollectionViewController: UICollectionViewController {
     // MARK: - PROPERTIES
     
     // MARK: - Collection cell reuse identifier
-    private let cellReuseIdentifier = "photoCell"
+    fileprivate let cellReuseIdentifier = "photoCell"
     
     // MARK: - Core data
     var selectedPin: Pin!
     var coreDataManager: CoreDataManager!
-    var fetchedResultsController: NSFetchedResultsController!
+    var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>!
     var photoEntityName = "Photo"
     
     // MARK: - UICollectionView performance
-    let photoCache = NSCache()
+    let photoCache = NSCache<AnyObject, AnyObject>()
     
     
     // MARK: - Manage collection button
@@ -79,7 +79,7 @@ class PhotoCollectionViewController: UICollectionViewController {
     }
     
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         cacheAllPhotos()
@@ -87,7 +87,7 @@ class PhotoCollectionViewController: UICollectionViewController {
     }
 
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
         fetchedResultsController.delegate = nil
@@ -109,7 +109,7 @@ class PhotoCollectionViewController: UICollectionViewController {
                 
             }
             
-            manageCollectionButton.enabled = true
+            manageCollectionButton.isEnabled = true
             manageCollectionButton.title = newCollectionString
             collectionViewInSelectionMode = false
             
@@ -127,10 +127,10 @@ class PhotoCollectionViewController: UICollectionViewController {
         } else {
             
             // Check if there is internet and notify user if it is absent
-           guard Reachability.isConnectedToNetwork() else { presentViewController(AlertControllers.noInternetAlert(), animated: true, completion: nil); return }
+           guard Reachability.isConnectedToNetwork() else { present(AlertControllers.noInternetAlert(), animated: true, completion: nil); return }
             
             // Disable button
-            manageCollectionButton.enabled = false
+            manageCollectionButton.isEnabled = false
             
             // Download photos
             delegate?.addNewCollection()
@@ -145,7 +145,7 @@ class PhotoCollectionViewController: UICollectionViewController {
     // MARK: - Configure flow layout
     func configureFlowLayout() {
         
-        let width = CGRectGetWidth(collectionView!.frame) / 3
+        let width = collectionView!.frame.width / 3
         let layout = collectionViewLayout as! UICollectionViewFlowLayout
         layout.itemSize = CGSize(width: width, height: width)
         
@@ -153,13 +153,13 @@ class PhotoCollectionViewController: UICollectionViewController {
     
 
     // MARK: - UICollectionViewDataSource
-    override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
         
         return 1
     }
 
 
-    override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
         if let sections = fetchedResultsController.sections {
             
@@ -172,16 +172,16 @@ class PhotoCollectionViewController: UICollectionViewController {
         return 0
     }
 
-    override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(cellReuseIdentifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellReuseIdentifier, for: indexPath) as! PhotoCollectionViewCell
     
-        guard let photo = fetchedResultsController.objectAtIndexPath(indexPath) as? Photo else { return cell }
+        guard let photo = fetchedResultsController.object(at: indexPath) as? Photo else { return cell }
         
         // Photo not saved yet to disk: show loading view and animating activity indicator.
         guard photo.savedToDisk else {
             
-            cell.loadingView.hidden = false
+            cell.loadingView.isHidden = false
             cell.activityIndicator.startAnimating()
             
             return cell
@@ -190,12 +190,12 @@ class PhotoCollectionViewController: UICollectionViewController {
         
         
         // Load photo from cache if it is cached already
-        if let photoImage = photoCache.objectForKey(photo.photoUniqueId) as? UIImage {
+        if let photoImage = photoCache.object(forKey: photo.photoUniqueId as AnyObject) as? UIImage {
             
             cell.activityIndicator.stopAnimating()
-            cell.loadingView.hidden = true
+            cell.loadingView.isHidden = true
             
-            cell.imageView.hidden = false
+            cell.imageView.isHidden = false
             cell.imageView.image = photoImage
             
             cell.imageIsLoaded = true
@@ -206,16 +206,16 @@ class PhotoCollectionViewController: UICollectionViewController {
             
         // If photo is not cached try to open it from disk and cache it, otherwise show loading view and animating activity indicator
         let photoUrlComponent = photo.photoUniqueId + ".jpg"
-        let photoPath = virtualTouristPhotosDirectoryUrl.URLByAppendingPathComponent(photoUrlComponent).path!
+        let photoPath = virtualTouristPhotosDirectoryUrl.appendingPathComponent(photoUrlComponent).path
         
         if let photoImage = UIImage(contentsOfFile: photoPath) {
             
-            photoCache.setObject(photoImage, forKey: photo.photoUniqueId)
+            photoCache.setObject(photoImage, forKey: photo.photoUniqueId as AnyObject)
             
             cell.activityIndicator.stopAnimating()
-            cell.loadingView.hidden = true
+            cell.loadingView.isHidden = true
             
-            cell.imageView.hidden = false
+            cell.imageView.isHidden = false
             cell.imageView.image = photoImage
             
             cell.imageIsLoaded = true
@@ -224,7 +224,7 @@ class PhotoCollectionViewController: UICollectionViewController {
             
         } else {
             
-            cell.loadingView.hidden = false
+            cell.loadingView.isHidden = false
             cell.activityIndicator.startAnimating()
             
             return cell
@@ -234,9 +234,9 @@ class PhotoCollectionViewController: UICollectionViewController {
     }
     
     // MARK: - UICollectionView delegate
-    override func collectionView(collectionView: UICollectionView, shouldSelectItemAtIndexPath indexPath: NSIndexPath) -> Bool {
+    override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         
-        guard let cell = collectionView.cellForItemAtIndexPath(indexPath) as? PhotoCollectionViewCell else { return false }
+        guard let cell = collectionView.cellForItem(at: indexPath) as? PhotoCollectionViewCell else { return false }
         
         let downloadAndSaveStatus = selectedPin.downloadAndSaveStatus
         
@@ -255,22 +255,22 @@ class PhotoCollectionViewController: UICollectionViewController {
     }
     
     
-    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         manageCollectionButton.title = removeSelectedPicturesString
         
         collectionViewInSelectionMode = true
         
-        guard let selectedPhoto = fetchedResultsController.objectAtIndexPath(indexPath) as? Photo else { return }
+        guard let selectedPhoto = fetchedResultsController.object(at: indexPath) as? Photo else { return }
         
         selectedPhotos.append(selectedPhoto)
         
     }
     
     
-    override func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
+    override func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         
-        if collectionView.indexPathsForSelectedItems()?.count == 0 {
+        if collectionView.indexPathsForSelectedItems?.count == 0 {
         
             manageCollectionButton.title = newCollectionString
             
@@ -278,25 +278,25 @@ class PhotoCollectionViewController: UICollectionViewController {
         
         }
         
-        guard let deselectedPhoto = fetchedResultsController.objectAtIndexPath(indexPath) as? Photo else { return }
+        guard let deselectedPhoto = fetchedResultsController.object(at: indexPath) as? Photo else { return }
         
-        guard let deselectedPhotoIndex = selectedPhotos.indexOf(deselectedPhoto) else { return }
+        guard let deselectedPhotoIndex = selectedPhotos.index(of: deselectedPhoto) else { return }
         
-        selectedPhotos.removeAtIndex(deselectedPhotoIndex)
+        selectedPhotos.remove(at: deselectedPhotoIndex)
         
     }
     
     
     // MARK - Photo caching
-    func cachePhoto(photoUniqueId: String) {
+    func cachePhoto(_ photoUniqueId: String) {
         
         let photoUrlComponent = photoUniqueId + ".jpg"
         
-        let photoPath = virtualTouristPhotosDirectoryUrl.URLByAppendingPathComponent(photoUrlComponent).path!
+        let photoPath = virtualTouristPhotosDirectoryUrl.appendingPathComponent(photoUrlComponent).path
         
         if let photoImage = UIImage(contentsOfFile: photoPath) {
             
-            photoCache.setObject(photoImage, forKey: photoUniqueId)
+            photoCache.setObject(photoImage, forKey: photoUniqueId as AnyObject)
             
         }
         
@@ -328,7 +328,7 @@ extension PhotoCollectionViewController: NSFetchedResultsControllerDelegate {
     
     func initializeFetchedResultsController() {
         
-        let request = NSFetchRequest(entityName: photoEntityName)
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: photoEntityName)
         
         let predicate = NSPredicate(format: "pin = %@", selectedPin)
         
@@ -359,18 +359,18 @@ extension PhotoCollectionViewController: NSFetchedResultsControllerDelegate {
     
     
     
-    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
         switch type {
             
-        case .Insert:
+        case .insert:
             
             photoCache.removeAllObjects()
             
             collectionView?.reloadData()
             
             
-        case .Update:
+        case .update:
             
             if let indexPath = indexPath {
                 
@@ -378,12 +378,12 @@ extension PhotoCollectionViewController: NSFetchedResultsControllerDelegate {
                 
                 cachePhoto(photo.photoUniqueId)
                 
-                collectionView?.reloadItemsAtIndexPaths([indexPath])
+                collectionView?.reloadItems(at: [indexPath])
                 
             }
             
   
-        case .Delete:
+        case .delete:
             
             if manageCollectionButton.title == removeSelectedPicturesString {
                 
@@ -391,18 +391,18 @@ extension PhotoCollectionViewController: NSFetchedResultsControllerDelegate {
                     
                     if let photo = anObject as? Photo {
                         
-                        photoCache.removeObjectForKey(photo.photoUniqueId)
+                        photoCache.removeObject(forKey: photo.photoUniqueId as AnyObject)
                         
                     }
                     
-                    collectionView?.deleteItemsAtIndexPaths([indexPath])
+                    collectionView?.deleteItems(at: [indexPath])
                     
                 }
                 
             }
             
             
-        case .Move:
+        case .move:
             
             return
             

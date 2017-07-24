@@ -12,7 +12,7 @@ import Foundation
 
 infix operator |> { associativity left precedence 160 }
 
-func |>(lhs: NSOperation, rhs: NSOperation) -> NSOperation {
+func |>(lhs: Operation, rhs: Operation) -> Operation {
     
     rhs.addDependency(lhs)
     

@@ -21,13 +21,13 @@ class PhotoCollectionViewCell: UICollectionViewCell {
     // MARK: - Cell state
     var imageIsLoaded = false
     
-    override var selected: Bool {
+    override var isSelected: Bool {
         
         didSet {
             
             if imageIsLoaded {
                 
-                selectionView.hidden = !selected
+                selectionView.isHidden = !isSelected
                 
             }
             

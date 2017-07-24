@@ -18,14 +18,14 @@ class DownloadAndSavePhotoBatchOperation: ConcurrentOperation {
     var uniqueId: String
     var coreDataManager: CoreDataManager
     var photoUrlsList: [PhotoUrlInfo]?
-    var downloadAndSavePhotoBatchQueue: NSOperationQueue!
+    var downloadAndSavePhotoBatchQueue: OperationQueue!
     
     var collectionUpdateStatus: CollectionUpdateStatus
     var missingPhotosUrlsList: [PhotoUrlInfo]?
     
     
     // MARK: - INITIALIZERS
-    init(uniqueId: String, coreDataManager: CoreDataManager, downloadAndSavePhotoBatchQueue: NSOperationQueue, collectionUpdateStatus: CollectionUpdateStatus, missingPhotosUrlsList: [PhotoUrlInfo]?) {
+    init(uniqueId: String, coreDataManager: CoreDataManager, downloadAndSavePhotoBatchQueue: OperationQueue, collectionUpdateStatus: CollectionUpdateStatus, missingPhotosUrlsList: [PhotoUrlInfo]?) {
         
         self.uniqueId = uniqueId
         self.coreDataManager = coreDataManager
@@ -43,7 +43,7 @@ class DownloadAndSavePhotoBatchOperation: ConcurrentOperation {
     // MARK: - METHODS
     override func main() {
         
-        if cancelled { cancelOperation(); return }
+        if isCancelled { cancelOperation(); return }
         
         if collectionUpdateStatus == .DownloadMissingPhotos {
             
@@ -67,11 +67,11 @@ class DownloadAndSavePhotoBatchOperation: ConcurrentOperation {
             
             for photoUrlInfo in photoUrlsList {
                 
-                if cancelled { cancelOperation(); return }
+                if isCancelled { cancelOperation(); return }
                 
                 let downloadAndSavePhotoToDiskOperation = DownloadAndSavePhotoToDiskOperation(uniqueId: uniqueId, photoUrlInfo: photoUrlInfo, coreDataManager: coreDataManager)
                 
-                if cancelled { cancelOperation(); return }
+                if isCancelled { cancelOperation(); return }
                 
                 downloadAndSavePhotoBatchQueue.addOperation(downloadAndSavePhotoToDiskOperation)
                 

@@ -12,14 +12,14 @@ import UIKit
 // Abstract class for concurrent NSOperations
 
 // MARK: - CLASS
-class ConcurrentOperation: NSOperation {
+class ConcurrentOperation: Operation {
     
     // NSOperation's states to be observed
     enum State: String {
         
         case Ready, Executing, Finished
         
-        private var keyPath: String {
+        fileprivate var keyPath: String {
             
             return "is" + rawValue
             
@@ -31,13 +31,13 @@ class ConcurrentOperation: NSOperation {
     var state = State.Ready {
         
         willSet {
-            willChangeValueForKey(newValue.keyPath)
-            willChangeValueForKey(state.keyPath)
+            willChangeValue(forKey: newValue.keyPath)
+            willChangeValue(forKey: state.keyPath)
         }
         
         didSet {
-            didChangeValueForKey(oldValue.keyPath)
-            didChangeValueForKey(state.keyPath)
+            didChangeValue(forKey: oldValue.keyPath)
+            didChangeValue(forKey: state.keyPath)
         }
     }
 }
@@ -48,24 +48,24 @@ class ConcurrentOperation: NSOperation {
 // MARK: - Extension for NSOperation overrides
 extension ConcurrentOperation {
 
-    override var ready: Bool {
-        return super.ready && state == .Ready
+    override var isReady: Bool {
+        return super.isReady && state == .Ready
     }
     
-    override var executing: Bool {
+    override var isExecuting: Bool {
         return state == .Executing
     }
     
-    override var finished: Bool {
+    override var isFinished: Bool {
         return state == .Finished
     }
     
-    override var asynchronous: Bool {
+    override var isAsynchronous: Bool {
         return true
     }
     
     override func start() {
-        if cancelled {
+        if isCancelled {
             state = .Finished
             return
         }

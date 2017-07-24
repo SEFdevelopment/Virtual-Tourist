@@ -30,11 +30,11 @@ class LocationInfoViewController: UITableViewController {
     // MARK: - Core data
     var selectedPin: Pin!
     var coreDataManager: CoreDataManager!
-    var fetchedResultsController: NSFetchedResultsController!
+    var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>!
     var locationInfoEntityName = "LocationInfo"
     
     // MARK: - Geocoding queue
-    var geocodingQueue: NSOperationQueue!
+    var geocodingQueue: OperationQueue!
     
     // MARK: - Loading status strings
     let gettingAddressString = "Getting address..."
@@ -79,7 +79,7 @@ class LocationInfoViewController: UITableViewController {
     func showLoadingView() {
         
         loadingStatusLabel.text = gettingAddressString
-        loadingView.hidden = false
+        loadingView.isHidden = false
         activityIndicator.startAnimating()
         
     }
@@ -88,13 +88,13 @@ class LocationInfoViewController: UITableViewController {
 
         activityIndicator.stopAnimating()
         
-        UIView.animateWithDuration(1.0, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+        UIView.animate(withDuration: 1.0, delay: 0.0, options: UIViewAnimationOptions.curveEaseOut, animations: {
             
                 self.loadingView.alpha = 0.0
             
             }, completion: { _ in
                 
-                self.loadingView.hidden = true
+                self.loadingView.isHidden = true
                 
         })
         
@@ -108,7 +108,7 @@ class LocationInfoViewController: UITableViewController {
         let coordinate = selectedAnnotation.coordinate
         let uniqueId = selectedAnnotation.uniqueId
         
-        let reverseGeocodingOperation = ReverseGeocodingOperation(coordinate: coordinate, uniqueId: uniqueId, coreDataManager: coreDataManager)
+        let reverseGeocodingOperation = ReverseGeocodingOperation(coordinate: coordinate, uniqueId: uniqueId!, coreDataManager: coreDataManager)
         
         geocodingQueue.addOperation(reverseGeocodingOperation)
         
@@ -125,7 +125,7 @@ extension LocationInfoViewController: NSFetchedResultsControllerDelegate {
     
     func initializeFetchedResultsController() {
         
-        let request = NSFetchRequest(entityName: locationInfoEntityName)
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: locationInfoEntityName)
         let addressStringSortDescriptor = NSSortDescriptor(key: "addressString", ascending: true)
         
         request.sortDescriptors = [addressStringSortDescriptor]
@@ -149,9 +149,9 @@ extension LocationInfoViewController: NSFetchedResultsControllerDelegate {
     }
     
     
-    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
-        if type == .Insert || type == .Update || type == .Move {
+        if type == .insert || type == .update || type == .move {
             
             hideLoadingView()
             

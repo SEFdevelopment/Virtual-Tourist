@@ -40,9 +40,9 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
     var mapState: MapState?
     
     // MARK: - Geocoding queue
-    lazy var geocodingQueue: NSOperationQueue = {
+    lazy var geocodingQueue: OperationQueue = {
         
-        let queue = NSOperationQueue()
+        let queue = OperationQueue()
         queue.maxConcurrentOperationCount = 1
         queue.name = "Geocoding queue"
         
@@ -62,9 +62,9 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
         super.viewDidLoad()
         
         // Subscribe to nofitications
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MapViewController.appMovingToBackgroundOrTerminate), name: UIApplicationDidEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(MapViewController.appMovingToBackgroundOrTerminate), name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MapViewController.appMovingToBackgroundOrTerminate), name: UIApplicationWillTerminateNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(MapViewController.appMovingToBackgroundOrTerminate), name: NSNotification.Name.UIApplicationWillTerminate, object: nil)
         
         
         // Load the map state
@@ -93,7 +93,7 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
     
     deinit {
         
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
         
     }
     
@@ -116,7 +116,7 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
     
 
     // MARK: - @IBActions
-    @IBAction func editButtonTapped(sender: UIBarButtonItem) {
+    @IBAction func editButtonTapped(_ sender: UIBarButtonItem) {
         
         if deleteViewConstraint.constant == 0 {
             
@@ -138,9 +138,9 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
 
     }
     
-    func adjustInfoViewsHeight(constant constant: CGFloat) {
+    func adjustInfoViewsHeight(constant: CGFloat) {
         
-        UIView.animateWithDuration(0.3, animations: {
+        UIView.animate(withDuration: 0.3, animations: {
             
             self.deleteViewConstraint.constant = constant
             self.view.layoutIfNeeded()
@@ -158,20 +158,20 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
     
     // Add a pin on long press. When still pressing and moving the finger a new pin will be added with each move and at the same time the previously created pin will be removed.
     
-    func addPinToMapView(longPressGestureRecognizer: UILongPressGestureRecognizer) {
+    func addPinToMapView(_ longPressGestureRecognizer: UILongPressGestureRecognizer) {
         
         guard deleteViewVisible == false else { return }
         
         switch longPressGestureRecognizer.state {
             
-        case .Possible:
+        case .possible:
             
             return
             
-        case .Began:
+        case .began:
             
-            let longPressLocation = longPressGestureRecognizer.locationInView(mapView)
-            let longPressCoordinate = mapView.convertPoint(longPressLocation, toCoordinateFromView: mapView)
+            let longPressLocation = longPressGestureRecognizer.location(in: mapView)
+            let longPressCoordinate = mapView.convert(longPressLocation, toCoordinateFrom: mapView)
             
             let annotation = MKPointAnnotationWithUniqueId()
             annotation.coordinate = longPressCoordinate
@@ -180,10 +180,10 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
             
             previousAnnotation = annotation
             
-        case .Changed:
+        case .changed:
             
-            let longPressLocation = longPressGestureRecognizer.locationInView(mapView)
-            let longPressCoordinate = mapView.convertPoint(longPressLocation, toCoordinateFromView: mapView)
+            let longPressLocation = longPressGestureRecognizer.location(in: mapView)
+            let longPressCoordinate = mapView.convert(longPressLocation, toCoordinateFrom: mapView)
             
             let currentAnnotation = MKPointAnnotationWithUniqueId()
             currentAnnotation.coordinate = longPressCoordinate
@@ -196,9 +196,9 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
             
             return
             
-        case .Ended:
+        case .ended:
             
-            let uniqueId = NSUUID().UUIDString
+            let uniqueId = UUID().uuidString
             previousAnnotation.uniqueId = uniqueId
             
             coreDataManager.insertPinToMangedContext(forAnnotation: previousAnnotation)
@@ -207,7 +207,7 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
             
             return
             
-        case .Failed:
+        case .failed:
             
             return
             
@@ -247,13 +247,13 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
     
     
     // MARK: - Storyboard segues
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         if segue.identifier == mapToContainerSegueString {
             
             let selectedPin = coreDataManager.fetchPinForAnnotation(selectedAnnotation)
             
-            let containerViewController = segue.destinationViewController as! ContainerViewController
+            let containerViewController = segue.destination as! ContainerViewController
             
             containerViewController.selectedAnnotation = selectedAnnotation
             containerViewController.geocodingQueue = geocodingQueue
@@ -271,14 +271,14 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
     
     // We prefetch from Flickr a list of photos for the new annotation (for exceeding the project expectations :) and also for user experience, so that the user will have to wait less in order to see the photos for a given location).
     
-    func prefetchPhotosForAnnotation(annotation: MKPointAnnotationWithUniqueId) {
+    func prefetchPhotosForAnnotation(_ annotation: MKPointAnnotationWithUniqueId) {
         
         downloadAndSavePhotosManager.downloadAndSavePhotosForAnnotation(annotation, collectionUpdateStatus: CollectionUpdateStatus.AddNewCollection, missingPhotosUrlsList: nil, coreDataManager: coreDataManager)
         
     }
     
     
-    func cancelDownloadingAndSavingPhotosForAnnotation(annotation: MKPointAnnotationWithUniqueId) {
+    func cancelDownloadingAndSavingPhotosForAnnotation(_ annotation: MKPointAnnotationWithUniqueId) {
         
         downloadAndSavePhotosManager.cancelDownloadingAndSavingPhotosForUniqueId(annotation.uniqueId)
         
@@ -294,11 +294,11 @@ class MapViewController: UIViewController, ContainerViewControllerDelegate {
 // MARK: - MKMapViewDelegate
 extension MapViewController: MKMapViewDelegate {
     
-    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
         let reuseIdentifier = "mapPin"
         
-        var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseIdentifier) as? MKPinAnnotationView
+        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseIdentifier) as? MKPinAnnotationView
         
         if pinView == nil {
             
@@ -306,7 +306,7 @@ extension MapViewController: MKMapViewDelegate {
             
             pinView!.canShowCallout = false
             
-            pinView!.pinTintColor = UIColor.redColor()
+            pinView!.pinTintColor = UIColor.red
             
 
         }
@@ -323,7 +323,7 @@ extension MapViewController: MKMapViewDelegate {
     }
     
     
-    func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         
         selectedAnnotation = view.annotation as! MKPointAnnotationWithUniqueId
         
@@ -341,7 +341,7 @@ extension MapViewController: MKMapViewDelegate {
 
         } else {
             
-            performSegueWithIdentifier(mapToContainerSegueString, sender: nil)
+            performSegue(withIdentifier: mapToContainerSegueString, sender: nil)
             
             mapView.deselectAnnotation(view.annotation, animated: false)
             
@@ -351,7 +351,7 @@ extension MapViewController: MKMapViewDelegate {
     
     
     
-    func mapViewDidFinishRenderingMap(mapView: MKMapView, fullyRendered: Bool) {
+    func mapViewDidFinishRenderingMap(_ mapView: MKMapView, fullyRendered: Bool) {
         
         if mapState == nil {
             

@@ -35,7 +35,7 @@ class ReverseGeocodingOperation: ConcurrentOperation {
         
         super.init()
         
-        qualityOfService = NSQualityOfService.UserInteractive
+        qualityOfService = QualityOfService.userInteractive
         
     }
     
@@ -48,19 +48,19 @@ class ReverseGeocodingOperation: ConcurrentOperation {
         
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         
-        if self.cancelled { self.cancelOperation(); return }
+        if self.isCancelled { self.cancelOperation(); return }
         
         
         geocoder.reverseGeocodeLocation(location, completionHandler: { placemarks, error in
             
             
-            if self.cancelled { self.cancelOperation(); return }
+            if self.isCancelled { self.cancelOperation(); return }
             
             guard error == nil else { self.updateLocationInfo(); return }
             
             // Convert CLPlacemark to String (http://stackoverflow.com/questions/33379114/clplacemark-to-string-in-ios-9)
             
-            guard let placemarks = placemarks where placemarks.count > 0 else { self.updateLocationInfo(); return }
+            guard let placemarks = placemarks, placemarks.count > 0 else { self.updateLocationInfo(); return }
             guard let placemark = placemarks.last else { self.updateLocationInfo(); return }
             
             guard let addressDictionary = placemark.addressDictionary else { self.updateLocationInfo(); return }
@@ -70,13 +70,13 @@ class ReverseGeocodingOperation: ConcurrentOperation {
             
             for addressLine in addressStringArray {
                 
-                if self.cancelled { self.cancelOperation(); return }
+                if self.isCancelled { self.cancelOperation(); return }
                 
                 self.addressString = self.addressString + addressLine + "\n"
                 
             }
             
-            if self.cancelled { self.cancelOperation(); return }
+            if self.isCancelled { self.cancelOperation(); return }
             
             self.updateLocationInfo()
 
@@ -87,9 +87,9 @@ class ReverseGeocodingOperation: ConcurrentOperation {
     
     func updateLocationInfo() {
         
-        if self.cancelled { self.cancelOperation(); return }
+        if self.isCancelled { self.cancelOperation(); return }
         
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             
             self.coreDataManager.updateLocationInfo(self.uniqueId, addressString: self.addressString)
             

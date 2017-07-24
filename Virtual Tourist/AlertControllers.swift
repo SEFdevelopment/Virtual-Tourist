@@ -17,9 +17,9 @@ class AlertControllers {
         let message = NSLocalizedString("There seem to be no internet connection. Please turn on the internet on your device and try again.", comment: "")
         let cancelButtonTitle = NSLocalizedString("Dismiss", comment: "")
         
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .Alert)
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         
-        let cancelAction = UIAlertAction(title: cancelButtonTitle, style: .Cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: cancelButtonTitle, style: .cancel, handler: nil)
         alertController.addAction(cancelAction)
         
         return alertController
@@ -33,9 +33,9 @@ class AlertControllers {
         let message = NSLocalizedString("There seem to be no more photos for this location. You may try again later.", comment: "")
         let cancelButtonTitle = NSLocalizedString("Dismiss", comment: "")
         
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .Alert)
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         
-        let cancelAction = UIAlertAction(title: cancelButtonTitle, style: .Cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: cancelButtonTitle, style: .cancel, handler: nil)
         alertController.addAction(cancelAction)
         
         return alertController

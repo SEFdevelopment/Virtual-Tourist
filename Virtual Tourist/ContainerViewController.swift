@@ -41,13 +41,13 @@ class ContainerViewController: UIViewController, UIPopoverPresentationController
     let containerToLocationInfoSegueString = "containerToLocationInfoSegue"
     
     // MARK: - Queues and operations
-    var geocodingQueue: NSOperationQueue!
+    var geocodingQueue: OperationQueue!
     var downloadAndSavePhotosManager: DownloadAndSavePhotosManager!
     
     // MARK: - Core data
     var coreDataManager: CoreDataManager!
     var selectedPin: Pin!
-    var fetchedResultsController: NSFetchedResultsController!
+    var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>!
     var pinEntityName = "Pin"
 
     // MARK: - Delegate
@@ -61,18 +61,18 @@ class ContainerViewController: UIViewController, UIPopoverPresentationController
         super.viewDidLoad()
         
         // Subscribe to nofitications
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ContainerViewController.appMovingToBackgroundOrTerminate), name: UIApplicationDidEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ContainerViewController.appMovingToBackgroundOrTerminate), name: NSNotification.Name.UIApplicationDidEnterBackground, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ContainerViewController.appMovingToBackgroundOrTerminate), name: UIApplicationWillTerminateNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ContainerViewController.appMovingToBackgroundOrTerminate), name: NSNotification.Name.UIApplicationWillTerminate, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ContainerViewController.appDidEnterForeground), name: UIApplicationWillEnterForegroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ContainerViewController.appDidEnterForeground), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
         
         // Fetched results controller
         initializeFetchedResultsController()
         
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         configureStatusView()
@@ -81,13 +81,13 @@ class ContainerViewController: UIViewController, UIPopoverPresentationController
     
 
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
         fetchedResultsController.delegate = nil
         fetchedResultsController = nil
         
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
         
     }
     
@@ -107,11 +107,11 @@ class ContainerViewController: UIViewController, UIPopoverPresentationController
     
     
     // MARK: - Storyboard segues
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         if segue.identifier == containerToSmallMapSegueString {
             
-            let smallMapViewController = segue.destinationViewController as! SmallMapViewController
+            let smallMapViewController = segue.destination as! SmallMapViewController
             
             smallMapViewController.selectedAnnotation = selectedAnnotation
             
@@ -120,7 +120,7 @@ class ContainerViewController: UIViewController, UIPopoverPresentationController
         
         if segue.identifier == containerToPhotoCollectionSegueString {
             
-            let photoCollectionViewController = segue.destinationViewController as! PhotoCollectionViewController
+            let photoCollectionViewController = segue.destination as! PhotoCollectionViewController
             
             photoCollectionViewController.coreDataManager = coreDataManager
             photoCollectionViewController.selectedPin = selectedPin
@@ -133,7 +133,7 @@ class ContainerViewController: UIViewController, UIPopoverPresentationController
         
         if segue.identifier == containerToLocationInfoSegueString {
             
-            let locationInfoViewController = segue.destinationViewController as! LocationInfoViewController
+            let locationInfoViewController = segue.destination as! LocationInfoViewController
             
             locationInfoViewController.selectedAnnotation = selectedAnnotation
             locationInfoViewController.selectedPin = selectedPin
@@ -142,7 +142,7 @@ class ContainerViewController: UIViewController, UIPopoverPresentationController
             locationInfoViewController.geocodingQueue = geocodingQueue
             
             // This view controller will be shown as a popover, even on iPhones
-            locationInfoViewController.modalPresentationStyle = UIModalPresentationStyle.Popover
+            locationInfoViewController.modalPresentationStyle = UIModalPresentationStyle.popover
             locationInfoViewController.popoverPresentationController?.delegate = self
             locationInfoViewController.preferredContentSize = CGSize(width: 300, height: 370)
             
@@ -152,9 +152,9 @@ class ContainerViewController: UIViewController, UIPopoverPresentationController
     }
     
     // MARK: - Popovers
-    func adaptivePresentationStyleForPresentationController(controller: UIPresentationController) -> UIModalPresentationStyle {
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
         
-        return UIModalPresentationStyle.None
+        return UIModalPresentationStyle.none
         
     }
     
@@ -173,7 +173,7 @@ extension ContainerViewController {
         
         let activeOperationForSelectedPin = downloadAndSavePhotosManager.activeOperationForUniqueId(selectedPin.uniqueId)
         
-        if (activeOperationForSelectedPin == nil) || (activeOperationForSelectedPin!.finished) {
+        if (activeOperationForSelectedPin == nil) || (activeOperationForSelectedPin!.isFinished) {
             
             downloadIsOngoing = false
             
@@ -193,15 +193,15 @@ extension ContainerViewController {
                     
                 case true:
                     
-                    manageCollectionButton.enabled = false
+                    manageCollectionButton.isEnabled = false
                     activityIndicator.startAnimating()
-                    statusView.hidden = false
+                    statusView.isHidden = false
                     
                 case false:
                     
-                    manageCollectionButton.enabled = true
+                    manageCollectionButton.isEnabled = true
                     activityIndicator.stopAnimating()
-                    statusView.hidden = false
+                    statusView.isHidden = false
                     
                 }
             
@@ -210,15 +210,15 @@ extension ContainerViewController {
                 
                 if selectedPin.photos.count == 0 {
                     
-                    manageCollectionButton.enabled = true
+                    manageCollectionButton.isEnabled = true
                     activityIndicator.stopAnimating()
-                    statusView.hidden = false
+                    statusView.isHidden = false
                     
                 } else {
                     
-                    manageCollectionButton.enabled = true
+                    manageCollectionButton.isEnabled = true
                     activityIndicator.stopAnimating()
-                    statusView.hidden = true
+                    statusView.isHidden = true
                 }
                 
 
@@ -226,9 +226,9 @@ extension ContainerViewController {
             
             case .InsertedPhotosForUrlsList:
                 
-                manageCollectionButton.enabled = false
+                manageCollectionButton.isEnabled = false
                 activityIndicator.stopAnimating()
-                statusView.hidden = true
+                statusView.isHidden = true
             
                 switch downloadIsOngoing {
                     
@@ -265,16 +265,16 @@ extension ContainerViewController {
             
             case .AllPhotosHaveBeenDownloadedAndSaved:
             
-                manageCollectionButton.enabled = true
+                manageCollectionButton.isEnabled = true
                 activityIndicator.stopAnimating()
-                statusView.hidden = true
+                statusView.isHidden = true
         
             
             case .AllPhotosHaveBeenDeleted:
             
-                manageCollectionButton.enabled = true
+                manageCollectionButton.isEnabled = true
                 activityIndicator.stopAnimating()
-                statusView.hidden = false
+                statusView.isHidden = false
             
             
         }
@@ -296,14 +296,14 @@ extension ContainerViewController: PhotoCollectionViewControllerDelegate {
     
     func addNewCollection() {
         
-        if statusView.hidden == true {
+        if statusView.isHidden == true {
             
             activityIndicator.startAnimating()
             statusLabel.text = ""
             statusView.alpha = 0.0
-            statusView.hidden = false
+            statusView.isHidden = false
             
-            UIView.animateWithDuration(1.5, delay: 0.0, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: {
+            UIView.animate(withDuration: 1.5, delay: 0.0, options: UIViewAnimationOptions.transitionCrossDissolve, animations: {
                 
                     self.statusView.alpha = 1.0
                 
@@ -312,7 +312,7 @@ extension ContainerViewController: PhotoCollectionViewControllerDelegate {
             
         } else {
             
-            UIView.animateWithDuration(1.5, animations: {
+            UIView.animate(withDuration: 1.5, animations: {
                 
                     self.statusLabel.text = ""
                 
@@ -346,7 +346,7 @@ extension ContainerViewController: NSFetchedResultsControllerDelegate {
     
     func initializeFetchedResultsController() {
         
-        let request = NSFetchRequest(entityName: pinEntityName)
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: pinEntityName)
         
         let predicate = NSPredicate(format: "uniqueId = %@", selectedPin.uniqueId)
         
@@ -375,11 +375,11 @@ extension ContainerViewController: NSFetchedResultsControllerDelegate {
     }
     
     
-    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
         switch type {
             
-        case .Update:
+        case .update:
 
             guard let pin = anObject as? Pin else { return }
             
@@ -404,7 +404,7 @@ extension ContainerViewController: NSFetchedResultsControllerDelegate {
                     // Show the statusView
                     activityIndicator.stopAnimating()
                     statusLabel.text = noPhotosString
-                    manageCollectionButton.enabled = true
+                    manageCollectionButton.isEnabled = true
                     
                     
                 } else {
@@ -414,19 +414,19 @@ extension ContainerViewController: NSFetchedResultsControllerDelegate {
                     
                     // Present the alert
                     let noMorePhotosAlert = AlertControllers.noMorePhotosFoundAlert()
-                    presentViewController(noMorePhotosAlert, animated: true, completion: nil)
+                    present(noMorePhotosAlert, animated: true, completion: nil)
                     
                     // Hide the statusView
-                    manageCollectionButton.enabled = true
+                    manageCollectionButton.isEnabled = true
                     
-                    UIView.animateWithDuration(1.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                    UIView.animate(withDuration: 1.5, delay: 0.0, options: UIViewAnimationOptions.curveEaseOut, animations: {
                         
                         self.statusView.alpha = 0.0
                         
                         }, completion: { _ in
                             
                             self.activityIndicator.stopAnimating()
-                            self.statusView.hidden = true
+                            self.statusView.isHidden = true
                             self.statusView.alpha = 1.0
                             
                     })
@@ -437,18 +437,18 @@ extension ContainerViewController: NSFetchedResultsControllerDelegate {
             
             case .InsertedPhotosForUrlsList:
                 
-                manageCollectionButton.enabled = false
+                manageCollectionButton.isEnabled = false
                 
-                if statusView.hidden == false {
+                if statusView.isHidden == false {
                     
-                    UIView.animateWithDuration(1.5, delay: 1.7, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                    UIView.animate(withDuration: 1.5, delay: 1.7, options: UIViewAnimationOptions.curveEaseOut, animations: {
                         
                             self.statusView.alpha = 0.0
                         
                         }, completion: { _ in
                             
                             self.activityIndicator.stopAnimating()
-                            self.statusView.hidden = true
+                            self.statusView.isHidden = true
                             self.statusView.alpha = 1.0
                             
                     })
@@ -460,20 +460,20 @@ extension ContainerViewController: NSFetchedResultsControllerDelegate {
                 
             case .AllPhotosHaveBeenDownloadedAndSaved:
                 
-                manageCollectionButton.enabled = true
+                manageCollectionButton.isEnabled = true
                 
                 
                 
             case .AllPhotosHaveBeenDeleted:
                 
-                manageCollectionButton.enabled = true
+                manageCollectionButton.isEnabled = true
                 activityIndicator.stopAnimating()
                 statusLabel.text = noPhotosString
                 
                 statusView.alpha = 0.0
-                statusView.hidden = false
+                statusView.isHidden = false
                 
-                UIView.animateWithDuration(1.0, delay: 0.0, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: {
+                UIView.animate(withDuration: 1.0, delay: 0.0, options: UIViewAnimationOptions.transitionCrossDissolve, animations: {
                     
                         self.statusView.alpha = 1.0
                     

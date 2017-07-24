@@ -16,17 +16,17 @@ class Photo: NSManagedObject {
         
         let photoUrlComponent = photoUniqueId + ".jpg"
         
-        let photoDeleteUrl = virtualTouristPhotosDirectoryUrl.URLByAppendingPathComponent(photoUrlComponent)
+        let photoDeleteUrl = virtualTouristPhotosDirectoryUrl.appendingPathComponent(photoUrlComponent)
         
-        guard let photoDeletePath = photoDeleteUrl.path else { return }
+        let photoDeletePath = photoDeleteUrl.path
         
-        let fileManager = NSFileManager.defaultManager()
+        let fileManager = FileManager.default
         
-        if fileManager.fileExistsAtPath(photoDeletePath) {
+        if fileManager.fileExists(atPath: photoDeletePath) {
             
             do {
                 
-                try fileManager.removeItemAtPath(photoDeletePath)
+                try fileManager.removeItem(atPath: photoDeletePath)
                 
             } catch {
                 

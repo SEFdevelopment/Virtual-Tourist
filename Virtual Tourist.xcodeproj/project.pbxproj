@@ -403,6 +403,7 @@
 					4E05EAC21C62167600D4AA79 = {
 						CreatedOnToolsVersion = 7.2.1;
 						DevelopmentTeam = 6UUGGKZNP7;
+						LastSwiftMigration = 0830;
 						SystemCapabilities = {
 							com.apple.Maps.iOS = {
 								enabled = 0;
@@ -412,11 +413,13 @@
 					4E05EAD61C62167600D4AA79 = {
 						CreatedOnToolsVersion = 7.2.1;
 						DevelopmentTeam = 6UUGGKZNP7;
+						LastSwiftMigration = 0830;
 						TestTargetID = 4E05EAC21C62167600D4AA79;
 					};
 					4E05EAE11C62167600D4AA79 = {
 						CreatedOnToolsVersion = 7.2.1;
 						DevelopmentTeam = 6UUGGKZNP7;
+						LastSwiftMigration = 0830;
 						TestTargetID = 4E05EAC21C62167600D4AA79;
 					};
 				};
@@ -645,6 +648,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "SEFdevelopment.Virtual-Tourist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -658,6 +662,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "SEFdevelopment.Virtual-Tourist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -669,6 +674,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "SEFdevelopment.Virtual-TouristTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Virtual Tourist.app/Virtual Tourist";
 			};
 			name = Debug;
@@ -681,6 +687,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "SEFdevelopment.Virtual-TouristTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Virtual Tourist.app/Virtual Tourist";
 			};
 			name = Release;
@@ -692,6 +699,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "SEFdevelopment.Virtual-TouristUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = "Virtual Tourist";
 				USES_XCTRUNNER = YES;
 			};
@@ -704,6 +712,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "SEFdevelopment.Virtual-TouristUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = "Virtual Tourist";
 				USES_XCTRUNNER = YES;
 			};

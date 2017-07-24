@@ -13,13 +13,13 @@ let reverseGeocodingErrorString = "reverseGeocodingError"
 
 
 // MARK: - Virtual tourist photo directory in Documents directory
-var virtualTouristPhotosDirectoryUrl: NSURL = {
+var virtualTouristPhotosDirectoryUrl: URL = {
 
-    let documentsDirectoryUrl = NSURL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0])
+    let documentsDirectoryUrl = URL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])
     
-    let virtualTouristPhotosDirectoryUrl = documentsDirectoryUrl.URLByAppendingPathComponent("virtualtouristphotos")
+    let virtualTouristPhotosDirectoryUrl = documentsDirectoryUrl.appendingPathComponent("virtualtouristphotos")
     
-    if NSFileManager.defaultManager().fileExistsAtPath(virtualTouristPhotosDirectoryUrl.path!) {
+    if FileManager.default.fileExists(atPath: virtualTouristPhotosDirectoryUrl.path) {
         
         return virtualTouristPhotosDirectoryUrl
         
@@ -34,11 +34,11 @@ var virtualTouristPhotosDirectoryUrl: NSURL = {
 }()
 
 
-private func createVirtualTouristPhotosDirectory(documentsDirectoryUrl: NSURL, virtualTouristPhotosDirectoryUrl: NSURL) {
+private func createVirtualTouristPhotosDirectory(_ documentsDirectoryUrl: URL, virtualTouristPhotosDirectoryUrl: URL) {
     
     do {
         
-        try NSFileManager.defaultManager().createDirectoryAtURL(virtualTouristPhotosDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
+        try FileManager.default.createDirectory(at: virtualTouristPhotosDirectoryUrl, withIntermediateDirectories: true, attributes: nil)
         
         
     } catch let error as NSError {

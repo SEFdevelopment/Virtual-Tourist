@@ -13,25 +13,25 @@ class DownloadAndSavePhotosManager {
     // PROPERTIES
     
     // MARK: - List of all operations
-    private var downloadAndSavePhotosOperationsList = [String: DownloadAndSavePhotosOperation]()
+    fileprivate var downloadAndSavePhotosOperationsList = [String: DownloadAndSavePhotosOperation]()
     
     
     // MARK: - METHODS
     
     // MARK: - Download and save photos
-    func downloadAndSavePhotosForAnnotation(annotation: MKPointAnnotationWithUniqueId, collectionUpdateStatus: CollectionUpdateStatus, missingPhotosUrlsList: [PhotoUrlInfo]?, coreDataManager: CoreDataManager) {
+    func downloadAndSavePhotosForAnnotation(_ annotation: MKPointAnnotationWithUniqueId, collectionUpdateStatus: CollectionUpdateStatus, missingPhotosUrlsList: [PhotoUrlInfo]?, coreDataManager: CoreDataManager) {
         
         let coordinate = annotation.coordinate
         let uniqueId = annotation.uniqueId
         
         
         // Create the operation
-        let downloadAndSavePhotosOperation = DownloadAndSavePhotosOperation(coordinate: coordinate, uniqueId: uniqueId, coreDataManager: coreDataManager, collectionUpdateStatus: collectionUpdateStatus, missingPhotosUrlsList: missingPhotosUrlsList)
+        let downloadAndSavePhotosOperation = DownloadAndSavePhotosOperation(coordinate: coordinate, uniqueId: uniqueId!, coreDataManager: coreDataManager, collectionUpdateStatus: collectionUpdateStatus, missingPhotosUrlsList: missingPhotosUrlsList)
         
         // Operation's completion block (for hiding network activity indicator)
         downloadAndSavePhotosOperation.completionBlock = {
             
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 
                 self.hideNetworkActivityIndicator()
                 
@@ -40,10 +40,10 @@ class DownloadAndSavePhotosManager {
         }
         
         // Add the operation to the list of operations and associated it with the annotation's uniqueId
-        downloadAndSavePhotosOperationsList[uniqueId] = downloadAndSavePhotosOperation
+        downloadAndSavePhotosOperationsList[uniqueId!] = downloadAndSavePhotosOperation
         
         // Show network activity indicator
-        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
         
         // Start the operation
         downloadAndSavePhotosOperation.start()
@@ -52,7 +52,7 @@ class DownloadAndSavePhotosManager {
     
     
     // MARK: - Active operation for uniqueId
-    func activeOperationForUniqueId(uniqueId: String) -> DownloadAndSavePhotosOperation? {
+    func activeOperationForUniqueId(_ uniqueId: String) -> DownloadAndSavePhotosOperation? {
         
         return downloadAndSavePhotosOperationsList[uniqueId]
         
@@ -64,7 +64,7 @@ class DownloadAndSavePhotosManager {
         
         for (_, operation) in downloadAndSavePhotosOperationsList {
             
-            if operation.finished == false { return false }
+            if operation.isFinished == false { return false }
             
         }
         
@@ -87,7 +87,7 @@ class DownloadAndSavePhotosManager {
     }
     
     
-    func cancelDownloadingAndSavingPhotosForUniqueId(uniqueId: String) {
+    func cancelDownloadingAndSavingPhotosForUniqueId(_ uniqueId: String) {
         
         if let operationToBeCancelled = downloadAndSavePhotosOperationsList[uniqueId] {
             
@@ -108,7 +108,7 @@ class DownloadAndSavePhotosManager {
         
         if allOperationsFinished() {
             
-            UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
             
         }
         
