@@ -120,7 +120,8 @@ class DownloadPhotoUrlsOperation: ConcurrentOperation {
         if isCancelled { cancelOperation(); return }
         
         
-        let request = getPhotoUrlsListRequest(coordinate, photoBatchNumber: photoBatchNumber)
+        let request = getPhotoUrlsListRequest(coordinate, photoBatchNumber: photoBatchNumber) as URLRequest
+        
         
         if isCancelled { cancelOperation(); return }
         
@@ -146,7 +147,7 @@ class DownloadPhotoUrlsOperation: ConcurrentOperation {
             
             do {
                 
-                let parsedJSON = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments)
+                guard let parsedJSON = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments) as? [String: AnyObject] else { self.couldNotGetPhotoUrls(); return }
                 
                 guard let photosDictionary = parsedJSON["photos"] as? [String: AnyObject] else { self.couldNotGetPhotoUrls(); return }
                 

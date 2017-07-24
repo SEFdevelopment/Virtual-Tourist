@@ -105,8 +105,7 @@ class DownloadAndSavePhotoToDiskOperation: ConcurrentOperation {
             
             let photoSaveUrl = virtualTouristPhotosDirectoryUrl.appendingPathComponent(photoUrlComponent)
             
-            guard let photoSaveUrlPath = photoSaveUrl.path else { self.couldNotSavePhoto(); return }
-            
+            let photoSaveUrlPath = photoSaveUrl.path            
             
             if self.isCancelled { self.cancelOperation(); return }
             
